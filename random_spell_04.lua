@@ -69,57 +69,55 @@ function random_spell_04:OnSpellStart()
 
 	if ability_level == 2 then ---------------------------------------------------------------Spell2
 	
-	function random_spell_04:GetAOERadius()
-			return self:GetSpecialValueFor( "radius" )
-	end
+	---------------------------------------
+	local point1 = caster:GetAbsOrigin()
+	local point2 = caster:GetAbsOrigin()
+	local delay = 1.7
+	local radius2 = 2222
 
-	function random_spell_04:OnSpellStart()
-	-- unit identifier
-			local enemies = FindUnitsInRadius(
-			caster:GetTeamNumber(),	-- int, your team number
-			caster:GetOrigin(),	-- point, center point
-			nil,	-- handle, cacheUnit. (not known)
-			9000,	-- float, radius. or use FIND_UNITS_EVERYWHERE
-			DOTA_UNIT_TARGET_TEAM_ENEMY,	-- int, team filter
-			DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,	-- int, type filter
-			0,	-- int, flag filter
-			0,	-- int, order filter
-			false	-- bool, can grow cache
-		)
-		local target = nil
-		for _,enemy in pairs(enemies) do
-			if enemy~=self:GetParent() then
-				target = enemy
-				break
-			end
-		end
-		local point = enemy:GetOrigin()
-		--local point = self:GetCursorPosition()
-
-	-- get values
-		local delay = 1.5
-		--local vision_distance = self:GetSpecialValueFor("vision_distance")
-		--local vision_duration = self:GetSpecialValueFor("vision_duration")
-
-	-- create modifier thinker
-	CreateModifierThinker(
-		caster,
-		self,
-		"random_spell_04",
-		{ duration = delay },
-		point,
-		caster:GetTeamNumber(),
+	local units = FindUnitsInRadius(
+		caster:GetTeamNumber(), 
+		caster:GetAbsOrigin(), 
+		nil, 
+		radius2, 
+		DOTA_UNIT_TARGET_TEAM_ENEMY, 
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 
+		0, 
+		0, 
 		false
-		)
+	) 
+local closest = radius2
 
-	-- create vision
-	--AddFOWViewer( caster:GetTeamNumber(), point, vision_distance, vision_duration, false )
+	for i,unit in ipairs(units) do
+		local unit_location = unit:GetAbsOrigin()
+		local vector_distance = point1 - unit_location
+		local distance = (vector_distance):Length2D()
+
+		if distance < closest and units ~= nil then
+			closest = distance
+			point2 = unit:GetAbsOrigin()
+		--else
+		--if units == nil then
+		--	point2 = caster:GetAbsOrigin()
+		end
+		
 	end
 
+	CreateModifierThinker(
+		caster, 
+		self, 
+		"modifier_random_spell_04c", 
+		{ duration = delay}, 
+		point2, 
+		--caster:GetAbsOrigin(),
+		caster:GetTeamNumber(), 
+		false
+	)
 
 
 
 
+-------------------------------------------------
 	end
 
 	if ability_level == 3 then ---------------------------------------------------------------Spell3 AOE Attack Speed Buff
